@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bashio
 
-PALACE_PATH="/data/palace"
+PALACE_PATH="/share/mempalace"
 IDENTITY_FILE="/data/identity.txt"
 MEMPALACE_HOME="/root/.mempalace"
 
@@ -20,6 +20,8 @@ cp "${IDENTITY_FILE}" "${MEMPALACE_HOME}/identity.txt"
 
 # --- Initialise palace on first run ---
 mkdir -p "${PALACE_PATH}"
+mkdir -p "${MEMPALACE_HOME}"
+ln -sfn "${PALACE_PATH}" "${MEMPALACE_HOME}/palace"
 
 if [ ! -f "${PALACE_PATH}/.ha_initialized" ]; then
     bashio::log.info "First run detected — initialising MemPalace palace..."
