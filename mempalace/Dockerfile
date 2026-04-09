@@ -1,7 +1,7 @@
 FROM ghcr.io/home-assistant/amd64-base-debian:latest
 
 LABEL \
-  io.hass.version="2.0.0" \
+  io.hass.version="2.0.1" \
   io.hass.type="addon" \
   io.hass.arch="amd64"
 
@@ -15,9 +15,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     build-essential \
-    ttyd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86_64 \
+    -o /usr/local/bin/ttyd && chmod +x /usr/local/bin/ttyd
 
 RUN pip3 install --no-cache-dir --break-system-packages \
     "chromadb==0.5.5" \
