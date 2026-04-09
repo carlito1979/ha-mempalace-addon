@@ -1,10 +1,9 @@
-ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base-debian:latest
-FROM $BUILD_FROM
+FROM ghcr.io/home-assistant/amd64-base-debian:latest
 
 LABEL \
-  io.hass.version="1.0.2" \
+  io.hass.version="1.0.3" \
   io.hass.type="addon" \
-  io.hass.arch="aarch64|amd64"
+  io.hass.arch="amd64"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
