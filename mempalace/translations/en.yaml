@@ -1,0 +1,22 @@
+configuration:
+  identity_name:
+    name: Your Name
+    description: >-
+      Your full name. Written into the palace identity file that is loaded
+      at the start of every Claude session.
+  identity_role:
+    name: Role and Organisation
+    description: >-
+      Your job title and organisation, e.g.
+      "Head of Merchandise Planning, Briscoe Group NZ".
+  identity_projects:
+    name: Active Projects
+    description: >-
+      Comma-separated list of current projects and tools, e.g.
+      "planning-tools (Claude Code, BigQuery), IA implementation (Impact Analytics)".
+  log_level:
+    name: Log Level
+    description: Controls the verbosity of add-on logs shown in Home Assistant.
+
+network:
+  8765/tcp: MemPalace MCP HTTP/SSE port

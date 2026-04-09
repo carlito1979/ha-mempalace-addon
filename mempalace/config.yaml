@@ -1,0 +1,36 @@
+name: MemPalace MCP Server
+version: "1.0.0"
+slug: mempalace
+description: >-
+  Persistent AI memory MCP server for Claude Code, Claude.ai and Cowork.
+  Runs MemPalace with an HTTP/SSE bridge on port 8765.
+url: https://github.com/carlito1979/ha-mempalace-addon
+arch:
+  - aarch64
+  - amd64
+startup: application
+boot: auto
+init: false
+
+ports:
+  8765/tcp: 8765
+ports_description:
+  8765/tcp: "MemPalace MCP HTTP/SSE endpoint"
+
+map:
+  - type: share
+    read_only: false
+
+watchdog: "http://[HOST]:[PORT:8765]/sse"
+
+options:
+  identity_name: ""
+  identity_role: ""
+  identity_projects: ""
+  log_level: "info"
+
+schema:
+  identity_name: str
+  identity_role: str
+  identity_projects: str
+  log_level: "list(trace|debug|info|notice|warning|error|fatal)"
