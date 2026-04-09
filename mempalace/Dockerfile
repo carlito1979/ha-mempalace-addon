@@ -1,23 +1,25 @@
-ARG BUILD_FROM=ghcr.io/home-assistant/base:latest
+ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base-debian:latest
 FROM $BUILD_FROM
 
 LABEL \
-  io.hass.version="1.0.1" \
+  io.hass.version="1.0.2" \
   io.hass.type="addon" \
   io.hass.arch="aarch64|amd64"
 
-RUN apk add --no-cache \
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
-    py3-pip \
+    python3-pip \
+    python3-dev \
     nodejs \
     npm \
     curl \
-    bash \
     gcc \
     g++ \
-    musl-dev \
-    rust \
-    cargo
+    build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g supergateway
 
