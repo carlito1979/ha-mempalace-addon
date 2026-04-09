@@ -1,7 +1,7 @@
 FROM ghcr.io/home-assistant/amd64-base-debian:latest
 
 LABEL \
-  io.hass.version="1.0.3" \
+  io.hass.version="2.0.0" \
   io.hass.type="addon" \
   io.hass.arch="amd64"
 
@@ -11,20 +11,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-dev \
-    nodejs \
-    npm \
     curl \
     gcc \
     g++ \
     build-essential \
+    ttyd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g supergateway
-
 RUN pip3 install --no-cache-dir --break-system-packages \
     "chromadb==0.5.5" \
-    "mempalace"
+    "mempalace" \
+    "mcp-proxy"
 
 COPY run.sh /
 RUN chmod a+x /run.sh

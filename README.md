@@ -4,17 +4,26 @@
 
 Run [MemPalace](https://github.com/milla-jovovich/mempalace) as a Home Assistant add-on. MemPalace gives Claude a persistent, structured long-term memory — it remembers who you are, what you're working on, and what it has learned across sessions.
 
-This add-on wraps the MemPalace MCP server (stdio) with [supergateway](https://github.com/nicholasgriffintn/supergateway) to expose it over **HTTP/SSE on port 8765**, making it reachable from Claude.ai, Claude Code, and Cowork.
+This add-on wraps the MemPalace MCP server (stdio) with [mcp-proxy](https://github.com/nicholasgriffintn/mcp-proxy) to expose it over **HTTP/SSE on port 8765**, making it reachable from Claude.ai, Claude Code, and Cowork. A built-in web terminal is available via the **Open Web UI** button in Home Assistant.
 
 ## How it works
 
 ```
-Claude  ---->  Cloudflare Tunnel  ---->  HA port 8765  ---->  supergateway  ---->  MemPalace MCP (stdio)
-                (cloudflared addon)        (this addon)          (HTTP/SSE bridge)      (Python)
+Claude.ai / Claude Code
+    │
+    ▼ (HTTPS)
+Cloudflare Tunnel (cloudflared HA add-on)
+    │
+    ▼ (HTTP, port 8765)
+mcp-proxy (Python, stdio → SSE/Streamable HTTP bridge)
+    │
+    ▼ (stdio)
+mempalace MCP server (python -m mempalace.mcp_server)
 ```
 
-- **supergateway** translates between HTTP/SSE and stdio so MemPalace's native stdio transport works over the network.
-- **Palace data** is stored in `/data/palace` inside the add-on container — this path is persistent and included in all Home Assistant backups automatically.
+- **mcp-proxy** bridges stdio to HTTP, exposing both `/sse` (SSE transport) and `/mcp` (Streamable HTTP transport) endpoints — no Node.js required.
+- **ttyd** provides a web terminal on port 7681, accessible via HA ingress ("Open Web UI" button on the add-on page).
+- **Palace data** is stored in `/data/palace` — persistent across restarts and included in all HA backups.
 - An **identity file** is generated from your add-on configuration on every start, so Claude knows who you are from the first message.
 
 ## Installation
@@ -37,18 +46,37 @@ Claude  ---->  Cloudflare Tunnel  ---->  HA port 8765  ---->  supergateway  ----
 
 On first launch the add-on initialises the palace directory structure. Subsequent restarts skip this step and reuse the existing palace.
 
+## Web Terminal
+
+Click **Open Web UI** on the add-on's Info page to get a shell inside the container. This uses `ttyd` served through HA ingress — no extra ports or authentication needed.
+
 ## Exposing via Cloudflare Tunnel
 
-The MCP server listens on port 8765 on your Home Assistant host. To make it reachable from Claude.ai or Cowork you need a public URL — the easiest way is with the [Cloudflared add-on](https://github.com/brenner-tobias/ha-addons):
+The MCP server listens on port 8765 on your Home Assistant host. To make it reachable from Claude.ai or Claude Code you need a public URL — the easiest way is with the [Cloudflared add-on](https://github.com/brenner-tobias/ha-addons):
 
 1. Install the **Cloudflared** add-on from the [brenner-tobias/ha-addons](https://github.com/brenner-tobias/ha-addons) repository.
 2. In the Cloudflared configuration, add an additional host entry:
 
    | Public hostname | Service |
-   |-----------------|--------|
+   |-----------------|---------|
    | `mempalace.yourdomain.com` | `http://localhost:8765` |
 
-3. In your Claude client, add the MCP server URL as `https://mempalace.yourdomain.com/sse`.
+### Connecting Claude.ai
+
+Add a custom connector in Claude.ai with the URL:
+```
+https://mempalace.yourdomain.com/sse
+```
+
+### Connecting Claude Code
+
+```bash
+claude mcp add --transport sse mempalace https://mempalace.yourdomain.com/sse
+```
+
+### Security note
+
+The MCP server does not require authentication. For security, use an obscure subdomain and consider adding Cloudflare IP restrictions (Access policies or WAF rules) to limit who can reach the endpoint.
 
 ## Architecture
 
@@ -57,24 +85,25 @@ ha-mempalace-addon/
 ├── repository.yaml                 # HA add-on repository metadata
 ├── README.md
 └── mempalace/
-    ├── config.yaml                 # Add-on config (ports, options, schema)
-    ├── Dockerfile                  # Alpine + Python + Node + supergateway + mempalace
-    ├── run.sh                      # Entrypoint: writes identity, inits palace, launches server
+    ├── config.yaml                 # Add-on config (ports, ingress, options, schema)
+    ├── Dockerfile                  # Debian + Python + mcp-proxy + ttyd + mempalace
+    ├── run.sh                      # Entrypoint: identity, palace init, ttyd, mcp-proxy
     └── translations/
         └── en.yaml                 # UI labels for the Configuration tab
 ```
 
 | Component | Role |
 |-----------|------|
-| **ghcr.io/home-assistant/base** | Alpine Linux base image required by HA |
+| **ghcr.io/home-assistant/amd64-base-debian** | Debian base image for HA add-ons |
 | **mempalace** (pip) | Python MCP server providing structured long-term memory |
-| **supergateway** (npm) | Bridges stdio ↔ HTTP/SSE so network clients can connect |
+| **mcp-proxy** (pip) | Bridges stdio to HTTP/SSE and Streamable HTTP |
+| **ttyd** (apt) | Web terminal served via HA ingress |
 | **bashio** | HA shell library for reading `options.json` and structured logging |
 
 ## Data and backups
 
 | Path | Purpose |
-|------|--------|
+|------|---------|
 | `/data/palace/` | All palace memory data (rooms, items, indices) |
 | `/data/identity.txt` | Generated identity file from your configuration |
 | `/root/.mempalace/identity.txt` | Copy placed where MemPalace expects it at runtime |
@@ -88,6 +117,7 @@ The `/data` directory is persistent across restarts and is automatically include
 | Add-on starts then stops immediately | Check the **Log** tab — usually a missing or empty configuration field |
 | `connection refused` on port 8765 | Verify the add-on is running and the port mapping shows `8765:8765/tcp` |
 | Cloudflare Tunnel not reaching the server | Ensure the Cloudflared service target is `http://localhost:8765`, not `https` |
+| "Open Web UI" button missing | Verify `ingress: true` and `ingress_port: 7681` are set in config.yaml |
 | Palace data lost after update | Data in `/data` survives add-on updates; if you uninstalled and reinstalled, restore from a backup |
 
 ## License
