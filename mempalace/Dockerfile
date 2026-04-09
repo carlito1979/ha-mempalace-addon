@@ -2,7 +2,7 @@ ARG BUILD_FROM=ghcr.io/home-assistant/base:latest
 FROM $BUILD_FROM
 
 LABEL \
-  io.hass.version="1.0.0" \
+  io.hass.version="1.0.1" \
   io.hass.type="addon" \
   io.hass.arch="aarch64|amd64"
 
@@ -12,11 +12,18 @@ RUN apk add --no-cache \
     nodejs \
     npm \
     curl \
-    bash
+    bash \
+    gcc \
+    g++ \
+    musl-dev \
+    rust \
+    cargo
 
 RUN npm install -g supergateway
 
-RUN pip3 install --no-cache-dir --break-system-packages mempalace
+RUN pip3 install --no-cache-dir --break-system-packages \
+    "chromadb==0.5.5" \
+    "mempalace"
 
 COPY run.sh /
 RUN chmod a+x /run.sh
