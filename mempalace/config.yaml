@@ -1,5 +1,5 @@
 name: MemPalace MCP Server
-version: "1.0.4"
+version: "1.0.5"
 slug: mempalace
 description: >-
   Persistent AI memory MCP server for Claude Code, Claude.ai and Cowork.

@@ -31,4 +31,5 @@ fi
 bashio::log.info "Launching MCP server on port 8765..."
 exec supergateway \
     --stdio "python3 -m mempalace.mcp_server" \
-    --port 8765
+    --port 8765 \
+    --streamableHttp
