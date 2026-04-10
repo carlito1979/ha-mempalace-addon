@@ -23,7 +23,7 @@ mempalace MCP server (python -m mempalace.mcp_server)
 
 - **mcp-proxy** bridges stdio to HTTP, exposing both `/sse` (SSE transport) and `/mcp` (Streamable HTTP transport) endpoints — no Node.js required.
 - **ttyd** provides a web terminal on port 7681, accessible via HA ingress ("Open Web UI" button on the add-on page).
-- **Palace data** is stored in `/share/mempalace` — persistent across restarts and included in all HA backups.
+- **Palace data** is stored in `/share/mempalace` — persistent across restarts and add-on updates. Included in full HA backups (not per-add-on backups; select the "share" folder explicitly for partial backups).
 - An **identity file** is generated from your add-on configuration on every start, so Claude knows who you are from the first message.
 
 ## Installation
@@ -119,7 +119,7 @@ ha-mempalace-addon/
 | `/data/identity.txt` | Generated identity file from your configuration |
 | `/root/.mempalace/identity.txt` | Copy placed where MemPalace expects it at runtime |
 
-The `/share` directory is persistent across restarts and is automatically included in Home Assistant snapshots and backups.
+The `/share` directory is persistent across restarts and add-on updates, and survives add-on uninstall/reinstall. It is included in **full** HA backups. For partial backups, select the **share** folder explicitly to include palace data.
 
 ## Troubleshooting
 
