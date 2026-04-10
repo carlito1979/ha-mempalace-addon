@@ -1,8 +1,9 @@
 name: MemPalace MCP Server
-version: "2.0.2"
+version: "3.1.0"
 slug: mempalace
 description: >-
-  Persistent AI memory MCP server for Claude Code, Claude.ai and Cowork.
+  Persistent AI memory MCP server with knowledge graph and specialist agents
+  for Claude Code, Claude.ai and Cowork.
   Runs MemPalace with mcp-proxy HTTP/SSE bridge on port 8765.
   Includes web terminal via HA ingress.
 url: https://github.com/carlito1979/ha-mempalace-addon
