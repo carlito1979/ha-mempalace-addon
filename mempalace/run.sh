@@ -25,7 +25,7 @@ ln -sfn "${PALACE_PATH}" "${MEMPALACE_HOME}/palace"
 
 if [ ! -f "${PALACE_PATH}/.ha_initialized" ]; then
     bashio::log.info "First run detected — initialising MemPalace palace..."
-    echo "" | mempalace init "${PALACE_PATH}" || true
+    mempalace init --yes "${PALACE_PATH}" || true
     touch "${PALACE_PATH}/.ha_initialized"
     bashio::log.info "Palace initialised at ${PALACE_PATH}"
 else
