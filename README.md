@@ -50,6 +50,8 @@ On first launch the add-on initialises the palace directory structure. Subsequen
 
 Click **Open Web UI** on the add-on's Info page to get a shell inside the container. This uses `ttyd` served through HA ingress — no extra ports or authentication needed.
 
+> **Note:** The container filesystem is ephemeral. Software installed or upgraded via the terminal (e.g. `pip install --upgrade mempalace`) will be lost on add-on update, rebuild, or host reboot. Only palace data in `/share/mempalace` persists. To change the installed mempalace version, update the Dockerfile and rebuild the add-on.
+
 ## Exposing via Cloudflare Tunnel
 
 The MCP server listens on port 8765 on your Home Assistant host. To make it reachable from Claude.ai or Claude Code you need a public URL — the easiest way is with the [Cloudflared add-on](https://github.com/brenner-tobias/ha-addons):
