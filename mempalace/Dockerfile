@@ -1,7 +1,7 @@
 FROM ghcr.io/home-assistant/amd64-base-debian:latest
 
 LABEL \
-  io.hass.version="3.1.0" \
+  io.hass.version="3.3.0" \
   io.hass.type="addon" \
   io.hass.arch="amd64"
 
@@ -24,8 +24,8 @@ RUN curl -fsSL https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86
     -o /usr/local/bin/ttyd && chmod +x /usr/local/bin/ttyd
 
 RUN pip3 install --no-cache-dir --break-system-packages \
-    "chromadb>=0.5.0,<0.7.0" \
-    "mempalace>=3.1.0,<4.0" \
+    "chromadb>=0.5.0" \
+    "mempalace>=3.3.0,<4.0" \
     "mcp-proxy"
 
 COPY run.sh /
