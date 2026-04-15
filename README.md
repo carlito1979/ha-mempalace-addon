@@ -2,7 +2,7 @@
 
 [![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fcarlito1979%2Fha-mempalace-addon)
 
-Run [MemPalace](https://github.com/milla-jovovich/mempalace) as a Home Assistant add-on. MemPalace gives Claude a persistent, structured long-term memory with knowledge graph and specialist agents — it remembers who you are, what you're working on, and what it has learned across sessions.
+Run [MemPalace](https://github.com/MemPalace/mempalace) as a Home Assistant add-on. MemPalace gives Claude a persistent, structured long-term memory with knowledge graph and specialist agents — it remembers who you are, what you're working on, and what it has learned across sessions.
 
 This add-on wraps the MemPalace MCP server (stdio) with [mcp-proxy](https://github.com/nicholasgriffintn/mcp-proxy) to expose it over **HTTP/SSE on port 8765**, making it reachable from Claude.ai, Claude Code, and Cowork. A built-in web terminal is available via the **Open Web UI** button in Home Assistant.
 
@@ -80,16 +80,18 @@ claude mcp add --transport sse mempalace https://mempalace.yourdomain.com/sse
 
 The MCP server does not require authentication. For security, use an obscure subdomain and consider adding Cloudflare IP restrictions (Access policies or WAF rules) to limit who can reach the endpoint.
 
-## Features (MemPalace 3.1.0)
+## Features (MemPalace 3.3.0)
 
-- **19 MCP tools** for structured memory management
+- **29 MCP tools** for structured memory management
+- **Closet layer** — compact AAAK search index (R@1 boosted 0.42 → 0.58)
+- **BM25 hybrid search** — 60% vector similarity + 40% Lucene IDF keyword matching
 - **Knowledge graph** with temporal entity-relationship triples (SQLite-backed)
-- **Specialist agent diaries** for per-agent context across sessions
-- **AAAK compression dialect** (experimental) for token-efficient storage
-- **`wake-up` command** for session context summaries
-- **Transcript splitting** via the `split` command
-- **Security hardened** with input validation and shell injection protection
-- **500 MB OOM guard** and **10K safety cap** on metadata fetches
+- **Cross-wing tunnels** for explicit project-to-project linking
+- **Halls** — content type routing (technical, emotions, family, memory, creative, identity, consciousness)
+- **Specialist agent diaries** with day-based drawer upsert
+- **Internationalization** — English, French, Korean, Japanese, Spanish, German, Simplified/Traditional Chinese
+- **`mempalace migrate`** command for cross-version recovery
+- **Security hardened** — palace deletion guardrails, WAL redaction, file-level locking
 
 ## Architecture
 
@@ -133,7 +135,8 @@ The `/share` directory is persistent across restarts and add-on updates, and sur
 | "Open Web UI" button missing | Verify `ingress: true` and `ingress_port: 7681` are set in config.yaml |
 | Palace data lost after update | Data in `/share/mempalace` survives add-on updates; if you uninstalled and reinstalled, restore from a backup |
 | Knowledge graph tools return empty results | The KG is populated on demand via `mempalace_kg_add`; it starts empty on fresh palaces |
+| Palace from older mempalace version won't open | Run `mempalace migrate /share/mempalace` from the web terminal to upgrade the schema |
 
 ## License
 
-This add-on repository is provided as-is. MemPalace itself is licensed under its own terms — see the [MemPalace repository](https://github.com/milla-jovovich/mempalace) for details.
+This add-on repository is provided as-is. MemPalace itself is licensed under its own terms — see the [MemPalace repository](https://github.com/MemPalace/mempalace) for details.
